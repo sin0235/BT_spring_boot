@@ -1,5 +1,7 @@
 D:\bt03\BT_spring_boot\src\main\java\vn\iotstar\config\WebConfig.java
+D:\bt03\BT_spring_boot\src\main\java\vn\iotstar\controller\ManagerUserController.java
 D:\bt03\BT_spring_boot\src\main\java\vn\iotstar\controller\ManagerController.java
+D:\bt03\BT_spring_boot\src\main\java\vn\iotstar\service\ImageService.java
 D:\bt03\BT_spring_boot\src\main\java\vn\iotstar\controller\ImageController.java
 D:\bt03\BT_spring_boot\src\main\java\vn\iotstar\repository\UserRepository.java
 D:\bt03\BT_spring_boot\src\main\java\vn\iotstar\repository\CategoryRepository.java
@@ -14,6 +16,7 @@ D:\bt03\BT_spring_boot\src\main\java\vn\iotstar\controller\UserController.java
 D:\bt03\BT_spring_boot\src\main\java\vn\iotstar\utils\FileUtils.java
 D:\bt03\BT_spring_boot\src\main\java\vn\iotstar\entity\User.java
 D:\bt03\BT_spring_boot\src\main\java\vn\iotstar\controller\HomeController.java
+D:\bt03\BT_spring_boot\src\main\java\vn\iotstar\controller\UserPreferencesController.java
 D:\bt03\BT_spring_boot\src\main\java\vn\iotstar\service\UserService.java
 D:\bt03\BT_spring_boot\src\main\java\vn\iotstar\controller\UserManagementController.java
 D:\bt03\BT_spring_boot\src\main\java\vn\iotstar\entity\Category.java

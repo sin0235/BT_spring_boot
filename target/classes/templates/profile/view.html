@@ -45,17 +45,9 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-4 text-center">
-                                <div class="avatar-container mb-3">
-                                    <img th:if="${user.image != null and !user.image.isEmpty()}" 
-                                         th:src="@{/uploads/avatars/} + ${user.image}" 
-                                         class="rounded-circle img-fluid" 
-                                         style="width: 150px; height: 150px; object-fit: cover;"
-                                         alt="Avatar">
-                                    <div th:if="${user.image == null or user.image.isEmpty()}" 
-                                         class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto" 
-                                         style="width: 150px; height: 150px;">
-                                        <i class="fas fa-user fa-4x text-white"></i>
-                                    </div>
+                                <!-- Avatar with enhanced styling -->
+                                <div class="position-relative d-inline-block mb-3">
+                                    <div th:replace="~{fragments/avatar :: avatar(${user}, 150, false)}"></div>
                                 </div>
                                 
                                 <div class="role-badge">

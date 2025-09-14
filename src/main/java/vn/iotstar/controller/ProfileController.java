@@ -3,20 +3,14 @@ package vn.iotstar.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vn.iotstar.entity.User;
 import vn.iotstar.service.UserService;
+import vn.iotstar.service.ImageService;
 
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
 @Controller
@@ -26,7 +20,8 @@ public class ProfileController {
     @Autowired
     private UserService userService;
     
-    private final String UPLOAD_DIR = "uploads/avatars/";
+    @Autowired
+    private ImageService imageService;
     
     @GetMapping
     public String viewProfile(HttpSession session, Model model) {
@@ -95,9 +90,26 @@ public class ProfileController {
             
             // Xử lý upload ảnh đại diện
             if (avatarFile != null && !avatarFile.isEmpty()) {
-                String fileName = uploadAvatar(avatarFile, currentUser.getUserId());
-                if (fileName != null) {
+                try {
+                    // Validate ảnh trước khi upload
+                    ImageService.ImageValidationResult validation = imageService.validateImage(avatarFile);
+                    if (!validation.isValid()) {
+                        redirectAttributes.addFlashAttribute("error", validation.getMessage());
+                        return "redirect:/profile/edit";
+                    }
+                    
+                    // Xóa ảnh cũ nếu có
+                    if (currentUser.getImage() != null && !currentUser.getImage().isEmpty()) {
+                        imageService.deleteAvatar(currentUser.getImage());
+                    }
+                    
+                    // Upload ảnh mới
+                    String fileName = imageService.uploadAvatar(avatarFile, currentUser.getUserId());
                     currentUser.setImage(fileName);
+                    
+                } catch (Exception e) {
+                    redirectAttributes.addFlashAttribute("error", "Lỗi khi upload ảnh: " + e.getMessage());
+                    return "redirect:/profile/edit";
                 }
             }
             
@@ -176,7 +188,7 @@ public class ProfileController {
                 
                 // Xóa file ảnh cũ nếu có
                 if (currentUser.getImage() != null && !currentUser.getImage().isEmpty()) {
-                    deleteAvatarFile(currentUser.getImage());
+                    imageService.deleteAvatar(currentUser.getImage());
                 }
                 
                 currentUser.setImage(null);
@@ -193,39 +205,4 @@ public class ProfileController {
         return "redirect:/profile";
     }
     
-    private String uploadAvatar(MultipartFile file, Integer userId) {
-        try {
-            String fileName = "avatar_" + userId + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            String uploadPath = System.getProperty("user.dir") + File.separator + UPLOAD_DIR;
-            
-            // Tạo thư mục nếu chưa tồn tại
-            File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
-            
-            Path filePath = Paths.get(uploadPath + fileName);
-            Files.write(filePath, file.getBytes());
-            
-            return UPLOAD_DIR + fileName;
-            
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    
-    private void deleteAvatarFile(String imagePath) {
-        try {
-            if (imagePath != null && !imagePath.isEmpty()) {
-                String fullPath = System.getProperty("user.dir") + File.separator + imagePath;
-                File file = new File(fullPath);
-                if (file.exists()) {
-                    file.delete();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

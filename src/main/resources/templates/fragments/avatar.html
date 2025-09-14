@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Avatar component - có thể tái sử dụng -->
+<div th:fragment="avatar(user, size, showName)" class="avatar-component">
+    <div class="d-flex align-items-center">
+        <!-- Avatar image/placeholder -->
+        <div class="avatar-wrapper position-relative" 
+             th:style="'width: ' + ${size} + 'px; height: ' + ${size} + 'px;'">
+            
+            <!-- Hiển thị ảnh nếu có -->
+            <img th:if="${user.image != null and !user.image.isEmpty()}" 
+                 th:src="@{'/uploads/avatars/' + ${user.image}}" 
+                 class="rounded-circle img-fluid border border-2 border-light shadow-sm" 
+                 th:style="'width: ' + ${size} + 'px; height: ' + ${size} + 'px; object-fit: cover;'"
+                 th:alt="${user.fullName}"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            
+            <!-- Placeholder với initials nếu không có ảnh -->
+            <div th:if="${user.image == null or user.image.isEmpty()}" 
+                 class="rounded-circle d-flex align-items-center justify-content-center border border-2 border-light shadow-sm text-white fw-bold"
+                 th:style="'width: ' + ${size} + 'px; height: ' + ${size} + 'px; font-size: ' + (${size} / 3) + 'px;'"
+                 th:classappend="${@imageService.getDefaultAvatarClass(user.fullName)}"
+                 th:text="${@imageService.getInitials(user.fullName)}">
+            </div>
+            
+            <!-- Status indicator (online/offline) - tùy chọn -->
+            <span th:if="${user.active}" 
+                  class="position-absolute bottom-0 end-0 bg-success border border-2 border-white rounded-circle"
+                  th:style="'width: ' + (${size} / 4) + 'px; height: ' + (${size} / 4) + 'px;'"
+                  title="Đang hoạt động"></span>
+        </div>
+        
+        <!-- Tên người dùng (tùy chọn) -->
+        <div th:if="${showName}" class="ms-3">
+            <div class="fw-semibold" th:text="${user.fullName}"></div>
+            <small class="text-muted" th:text="'@' + ${user.username}"></small>
+        </div>
+    </div>
+</div>
+
+<!-- Avatar upload component với preview -->
+<div th:fragment="avatarUpload(user, inputId)" class="avatar-upload-component">
+    <div class="text-center">
+        <!-- Preview area -->
+        <div class="avatar-preview-wrapper position-relative d-inline-block mb-3">
+            <div class="avatar-preview" style="width: 150px; height: 150px;">
+                <!-- Current avatar -->
+                <img th:if="${user.image != null and !user.image.isEmpty()}" 
+                     th:src="@{'/uploads/avatars/' + ${user.image}}" 
+                     class="rounded-circle img-fluid border border-3 border-primary shadow"
+                     style="width: 150px; height: 150px; object-fit: cover;"
+                     th:alt="${user.fullName}"
+                     id="avatarPreview">
+                
+                <!-- Placeholder -->
+                <div th:if="${user.image == null or user.image.isEmpty()}" 
+                     class="rounded-circle d-flex align-items-center justify-content-center border border-3 border-primary shadow text-white fw-bold"
+                     style="width: 150px; height: 150px; font-size: 2.5rem;"
+                     th:classappend="${@imageService.getDefaultAvatarClass(user.fullName)}"
+                     th:text="${@imageService.getInitials(user.fullName)}"
+                     id="avatarPlaceholder">
+                </div>
+            </div>
+            
+            <!-- Upload overlay -->
+            <div class="avatar-overlay position-absolute top-0 start-0 w-100 h-100 rounded-circle d-flex align-items-center justify-content-center"
+                 style="background: rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.3s;"
+                 onmouseover="this.style.opacity='1'"
+                 onmouseout="this.style.opacity='0'"
+                 onclick="document.getElementById('[[${inputId}]]').click()">
+                <i class="fas fa-camera fa-2x text-white"></i>
+            </div>
+        </div>
+        
+        <!-- File input (hidden) -->
+        <input type="file" 
+               th:id="${inputId}"
+               name="avatarFile" 
+               class="d-none" 
+               accept="image/*"
+               onchange="previewAvatar(this)">
+        
+        <!-- Upload button -->
+        <div class="mb-2">
+            <button type="button" class="btn btn-outline-primary btn-sm" 
+                    th:onclick="'document.getElementById(\'' + ${inputId} + '\').click()'">
+                <i class="fas fa-upload me-2"></i>Chọn ảnh mới
+            </button>
+        </div>
+        
+        <!-- Guidelines -->
+        <div class="small text-muted">
+            <i class="fas fa-info-circle me-1"></i>
+            Định dạng: JPG, PNG, GIF, WebP. Tối đa 5MB.
+        </div>
+    </div>
+</div>
+
+<!-- Avatar grid component cho danh sách -->
+<div th:fragment="avatarGrid(users)" class="avatar-grid">
+    <div class="row g-3">
+        <div th:each="user : ${users}" class="col-auto">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center p-3">
+                    <!-- Avatar -->
+                    <div th:replace="~{fragments/avatar :: avatar(${user}, 80, false)}"></div>
+                    
+                    <!-- User info -->
+                    <div class="mt-2">
+                        <div class="fw-semibold small" th:text="${user.fullName}"></div>
+                        <div class="text-muted" style="font-size: 0.75rem;" th:text="'@' + ${user.username}"></div>
+                        
+                        <!-- Role badge -->
+                        <span th:if="${user.roleId == 1}" class="badge bg-success mt-1" style="font-size: 0.65rem;">User</span>
+                        <span th:if="${user.roleId == 2}" class="badge bg-warning mt-1" style="font-size: 0.65rem;">Manager</span>
+                        <span th:if="${user.roleId == 3}" class="badge bg-danger mt-1" style="font-size: 0.65rem;">Admin</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:fragment="avatarScript">
+    function previewAvatar(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            
+            // Validate file size (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Kích thước file không được vượt quá 5MB');
+                input.value = '';
+                return;
+            }
+            
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('Chỉ hỗ trợ các định dạng: JPG, PNG, GIF, WebP');
+                input.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Hide placeholder
+                const placeholder = document.getElementById('avatarPlaceholder');
+                if (placeholder) {
+                    placeholder.style.display = 'none';
+                }
+                
+                // Show/update preview image
+                let preview = document.getElementById('avatarPreview');
+                if (!preview) {
+                    preview = document.createElement('img');
+                    preview.id = 'avatarPreview';
+                    preview.className = 'rounded-circle img-fluid border border-3 border-primary shadow';
+                    preview.style.cssText = 'width: 150px; height: 150px; object-fit: cover;';
+                    document.querySelector('.avatar-preview').appendChild(preview);
+                }
+                
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+    
+    // Auto-hide alerts
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert[data-auto-hide]');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                if (alert) {
+                    alert.style.transition = 'opacity 0.5s';
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 500);
+                }
+            }, 5000);
+        });
+    });
+</script>
+
+</body>
+</html>

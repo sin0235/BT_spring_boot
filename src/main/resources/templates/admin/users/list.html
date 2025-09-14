@@ -90,16 +90,7 @@
                             <tr th:each="user : ${users}">
                                 <td th:text="${user.userId}"></td>
                                 <td>
-                                    <img th:if="${user.image != null and !user.image.isEmpty()}" 
-                                         th:src="@{/uploads/avatars/} + ${user.image}" 
-                                         class="rounded-circle" 
-                                         style="width: 40px; height: 40px; object-fit: cover;"
-                                         alt="Avatar">
-                                    <div th:if="${user.image == null or user.image.isEmpty()}" 
-                                         class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" 
-                                         style="width: 40px; height: 40px;">
-                                        <i class="fas fa-user text-white"></i>
-                                    </div>
+                                    <div th:replace="~{fragments/avatar :: avatar(${user}, 40, false)}"></div>
                                 </td>
                                 <td th:text="${user.username}"></td>
                                 <td th:text="${user.fullName}"></td>

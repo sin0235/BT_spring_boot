@@ -6,6 +6,7 @@ vn\iotstar\controller\ManagerController.class
 vn\iotstar\controller\AuthController.class
 vn\iotstar\entity\User.class
 vn\iotstar\service\CategoryService.class
+vn\iotstar\controller\ManagerUserController.class
 vn\iotstar\controller\UserController.class
 vn\iotstar\controller\AdminController.class
 vn\iotstar\repository\UserRepository.class
@@ -16,4 +17,7 @@ vn\iotstar\repository\CategoryRepository.class
 vn\iotstar\controller\UserManagementController.class
 vn\iotstar\utils\FileUtils.class
 vn\iotstar\controller\HomeController.class
+vn\iotstar\service\ImageService$ImageValidationResult.class
 vn\iotstar\config\WebConfig.class
+vn\iotstar\controller\UserPreferencesController.class
+vn\iotstar\service\ImageService.class
