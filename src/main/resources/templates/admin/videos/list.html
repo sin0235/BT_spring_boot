@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Management - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#" th:href="@{/admin/home}">Admin Panel</a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3" th:text="'Welcome, ' + ${user.fullName}"></span>
+                <a class="nav-link" th:href="@{/profile}">Profile</a>
+                <a class="nav-link" th:href="@{/auth/logout}">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-video me-2"></i>Video Management</h2>
+            <a th:href="@{/admin/videos/add}" class="btn btn-success">
+                <i class="fas fa-plus me-1"></i>Add New Video
+            </a>
+        </div>
+
+        <!-- Success/Error Messages -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i><span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i><span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Search and Filter Form -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" th:action="@{/admin/videos}">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label for="search" class="form-label">Search Video</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   th:value="${search}" placeholder="Search by title, description...">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="userId" class="form-label">User</label>
+                            <select class="form-select" id="userId" name="userId">
+                                <option value="">All Users</option>
+                                <option th:each="userItem : ${users}" 
+                                        th:value="${userItem.userId}"
+                                        th:selected="${userFilter == userItem.userId}"
+                                        th:text="${userItem.fullName}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="categoryId" class="form-label">Category</label>
+                            <select class="form-select" id="categoryId" name="categoryId">
+                                <option value="">All Categories</option>
+                                <option th:each="category : ${categories}" 
+                                        th:value="${category.cateid}"
+                                        th:selected="${categoryFilter == category.cateid}"
+                                        th:text="${category.catename}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="isActive" class="form-label">Status</label>
+                            <select class="form-select" id="isActive" name="isActive">
+                                <option value="">All Status</option>
+                                <option value="true" th:selected="${statusFilter == true}">Active</option>
+                                <option value="false" th:selected="${statusFilter == false}">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Videos Table -->
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Thumbnail</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Owner</th>
+                                <th>Duration</th>
+                                <th>Views</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="video : ${videos}">
+                                <td th:text="${video.videoId}"></td>
+                                <td>
+                                    <div th:if="${video.thumbnailFilename != null}">
+                                        <img th:src="@{'/uploads/' + ${video.thumbnailFilename}}" 
+                                             alt="Video Thumbnail" class="rounded" 
+                                             style="width: 60px; height: 40px; object-fit: cover;">
+                                    </div>
+                                    <div th:unless="${video.thumbnailFilename != null}">
+                                        <div class="rounded bg-light d-flex align-items-center justify-content-center" 
+                                             style="width: 60px; height: 40px;">
+                                            <i class="fas fa-video text-muted"></i>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong th:text="${video.title}"></strong>
+                                        <br>
+                                        <small class="text-muted" 
+                                               th:text="${video.description != null ? (video.description.length() > 50 ? video.description.substring(0, 50) + '...' : video.description) : 'No description'}"></small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span th:if="${video.category != null}" 
+                                          th:text="${video.category.catename}"
+                                          class="badge bg-info"></span>
+                                    <span th:unless="${video.category != null}" 
+                                          class="text-muted">Unknown</span>
+                                </td>
+                                <td>
+                                    <span th:if="${video.user != null}" 
+                                          th:text="${video.user.fullName}"></span>
+                                    <span th:unless="${video.user != null}" 
+                                          class="text-muted">Unknown</span>
+                                </td>
+                                <td th:text="${video.formattedDuration}"></td>
+                                <td>
+                                    <span th:text="${video.formattedViews}"></span>
+                                    <br>
+                                    <small class="text-muted" th:text="${video.views + ' views'}"></small>
+                                </td>
+                                <td>
+                                    <span th:if="${video.active && video.public}" class="badge bg-success">Public</span>
+                                    <span th:if="${video.active && !video.public}" class="badge bg-warning">Private</span>
+                                    <span th:unless="${video.active}" class="badge bg-danger">Inactive</span>
+                                </td>
+                                <td th:text="${#temporals.format(video.createdAt, 'dd/MM/yyyy')}"></td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a th:href="@{/admin/videos/edit/{id}(id=${video.videoId})}" 
+                                           class="btn btn-sm btn-outline-primary" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form th:action="@{/admin/videos/toggle/{id}(id=${video.videoId})}" 
+                                              method="post" style="display: inline;">
+                                            <button type="submit" class="btn btn-sm btn-outline-warning" 
+                                                    title="Toggle Status">
+                                                <i class="fas fa-toggle-on"></i>
+                                            </button>
+                                        </form>
+                                        <form th:action="@{/admin/videos/delete/{id}(id=${video.videoId})}" 
+                                              method="post" style="display: inline;"
+                                              onsubmit="return confirm('Are you sure you want to delete this video?')">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div th:if="${videos.empty}" class="text-center py-4">
+                    <i class="fas fa-video fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No videos found</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back to Dashboard -->
+        <div class="mt-4">
+            <a th:href="@{/admin/home}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

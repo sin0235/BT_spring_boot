@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${isEdit ? 'Edit User' : 'Add User'} + ' - Admin'"></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#" th:href="@{/admin/home}">Admin Panel</a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3" th:text="'Welcome, ' + ${user.fullName}"></span>
+                <a class="nav-link" th:href="@{/profile}">Profile</a>
+                <a class="nav-link" th:href="@{/auth/logout}">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>
+                            <i th:class="${isEdit ? 'fas fa-edit' : 'fas fa-plus'} + ' me-2'"></i>
+                            <span th:text="${isEdit ? 'Edit User' : 'Add New User'}"></span>
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Error Messages -->
+                        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i><span th:text="${errorMessage}"></span>
+                        </div>
+
+                        <form th:action="${isEdit ? '/admin/users/edit/' + editUser.userId : '/admin/users/add'}" 
+                              method="post" 
+                              th:object="${isEdit ? editUser : newUser}">
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="username" class="form-label">Username *</label>
+                                        <input type="text" class="form-control" id="username" 
+                                               th:field="*{username}" required
+                                               th:classappend="${#fields.hasErrors('username')} ? 'is-invalid' : ''">
+                                        <div th:if="${#fields.hasErrors('username')}" class="invalid-feedback">
+                                            <span th:errors="*{username}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email *</label>
+                                        <input type="email" class="form-control" id="email" 
+                                               th:field="*{email}" required
+                                               th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''">
+                                        <div th:if="${#fields.hasErrors('email')}" class="invalid-feedback">
+                                            <span th:errors="*{email}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="fullName" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="fullName" 
+                                       th:field="*{fullName}" required
+                                       th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''">
+                                <div th:if="${#fields.hasErrors('fullName')}" class="invalid-feedback">
+                                    <span th:errors="*{fullName}"></span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="password" class="form-label">
+                                            Password <span th:if="${!isEdit}">*</span>
+                                            <span th:if="${isEdit}" class="text-muted">(Leave blank to keep current)</span>
+                                        </label>
+                                        <input type="password" class="form-control" id="password" 
+                                               th:field="*{password}" 
+                                               th:required="${!isEdit}"
+                                               th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''">
+                                        <div th:if="${#fields.hasErrors('password')}" class="invalid-feedback">
+                                            <span th:errors="*{password}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="phone" class="form-label">Phone</label>
+                                        <input type="tel" class="form-control" id="phone" 
+                                               th:field="*{phone}"
+                                               th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid' : ''">
+                                        <div th:if="${#fields.hasErrors('phone')}" class="invalid-feedback">
+                                            <span th:errors="*{phone}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="roleId" class="form-label">Role *</label>
+                                        <select class="form-select" id="roleId" 
+                                                th:field="*{roleId}" required
+                                                th:classappend="${#fields.hasErrors('roleId')} ? 'is-invalid' : ''">
+                                            <option value="">Select Role</option>
+                                            <option value="1">User</option>
+                                            <option value="2">Manager</option>
+                                            <option value="3">Admin</option>
+                                        </select>
+                                        <div th:if="${#fields.hasErrors('roleId')}" class="invalid-feedback">
+                                            <span th:errors="*{roleId}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="isActive" class="form-label">Status</label>
+                                        <select class="form-select" id="isActive" th:field="*{active}">
+                                            <option value="true">Active</option>
+                                            <option value="false">Inactive</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="image" class="form-label">Avatar Image</label>
+                                <input type="text" class="form-control" id="image" 
+                                       th:field="*{image}" placeholder="Avatar filename">
+                                <small class="form-text text-muted">Enter the filename of the uploaded avatar image</small>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a th:href="@{/admin/users}" class="btn btn-secondary">
+                                    <i class="fas fa-times me-1"></i>Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i th:class="${isEdit ? 'fas fa-save' : 'fas fa-plus'} + ' me-1'"></i>
+                                    <span th:text="${isEdit ? 'Update User' : 'Create User'}"></span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -38,12 +38,54 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Quick Actions</h5>
-                        <a th:href="@{/categories}" class="btn btn-secondary me-2">
+                        <a th:href="@{/categories}" class="btn btn-secondary">
                             <i class="fas fa-list me-2"></i>My Categories
                         </a>
-                        <a th:href="@{/profile}" class="btn btn-success">
-                            <i class="fas fa-user me-2"></i>My Profile
-                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manager's Categories List -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">My Categories</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${categories != null and !categories.empty}">
+                            <div class="row">
+                                <div th:each="category : ${categories}" class="col-md-4 mb-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center">
+                                                <div th:if="${category.iconFilename != null}" class="me-3">
+                                                    <img th:src="@{'/uploads/' + ${category.iconFilename}}" 
+                                                         alt="Category Icon" class="rounded" 
+                                                         style="width: 48px; height: 48px; object-fit: cover;">
+                                                </div>
+                                                <div th:unless="${category.iconFilename != null}" class="me-3">
+                                                    <i class="fas fa-folder fa-2x text-primary"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="card-title mb-1" th:text="${category.catename}"></h6>
+                                                    <small class="text-muted">ID: <span th:text="${category.cateid}"></span></small><br>
+                                                    <small class="text-muted">Created: <span th:text="${#temporals.format(category.createdAt, 'dd/MM/yyyy')}"></span></small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:if="${categories == null or categories.empty}" class="text-center py-4">
+                            <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">You haven't created any categories yet</p>
+                            <a th:href="@{/categories/add}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Create First Category
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

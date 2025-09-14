@@ -24,9 +24,11 @@ public class UserController {
             return "redirect:/auth/login";
         }
         
-        // Add user's categories
+        // Add user's categories count
         long userCategories = categoryService.findByUserId(user.getUserId()).size();
         
+        // Add all categories for user to view
+        model.addAttribute("categories", categoryService.findAll());
         model.addAttribute("userCategories", userCategories);
         model.addAttribute("user", user);
         

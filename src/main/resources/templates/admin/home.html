@@ -22,19 +22,63 @@
         <h2>Admin Dashboard</h2>
         
         <div class="row">
-            <div class="col-md-6">
-                <div class="card">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
                     <div class="card-body">
-                        <h5 class="card-title">Total Users</h5>
-                        <p class="card-text display-4" th:text="${totalUsers}"></p>
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5 class="card-title">Total Users</h5>
+                                <p class="card-text display-6" th:text="${totalUsers}"></p>
+                            </div>
+                            <div>
+                                <i class="fas fa-users fa-2x"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="card">
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
                     <div class="card-body">
-                        <h5 class="card-title">Total Categories</h5>
-                        <p class="card-text display-4" th:text="${totalCategories}"></p>
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5 class="card-title">Active Users</h5>
+                                <p class="card-text display-6" th:text="${activeUsers}"></p>
+                            </div>
+                            <div>
+                                <i class="fas fa-user-check fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5 class="card-title">Categories</h5>
+                                <p class="card-text display-6" th:text="${totalCategories}"></p>
+                            </div>
+                            <div>
+                                <i class="fas fa-folder fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5 class="card-title">Videos</h5>
+                                <p class="card-text display-6" th:text="${totalVideos}"></p>
+                            </div>
+                            <div>
+                                <i class="fas fa-video fa-2x"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -45,10 +89,60 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Quick Actions</h5>
-                        <a th:href="@{/admin/users}" class="btn btn-primary me-2">User Management</a>
-                        <a th:href="@{/admin/categories}" class="btn btn-secondary me-2">Manage Categories</a>
-                        <a th:href="@{/categories}" class="btn btn-info me-2">My Categories</a>
-                        <a th:href="@{/profile}" class="btn btn-success">My Profile</a>
+                        <a th:href="@{/admin/users}" class="btn btn-primary me-2">
+                            <i class="fas fa-users me-1"></i>Manage Users
+                        </a>
+                        <a th:href="@{/admin/categories}" class="btn btn-info me-2">
+                            <i class="fas fa-folder me-1"></i>Manage Categories
+                        </a>
+                        <a th:href="@{/admin/videos}" class="btn btn-warning me-2">
+                            <i class="fas fa-video me-1"></i>Manage Videos
+                        </a>
+                        <a th:href="@{/categories}" class="btn btn-secondary">
+                            <i class="fas fa-list me-1"></i>My Categories
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories List -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">All Categories</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${categories != null and !categories.empty}">
+                            <div class="row">
+                                <div th:each="category : ${categories}" class="col-md-4 mb-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center">
+                                                <div th:if="${category.iconFilename != null}" class="me-3">
+                                                    <img th:src="@{'/uploads/' + ${category.iconFilename}}" 
+                                                         alt="Category Icon" class="rounded" 
+                                                         style="width: 48px; height: 48px; object-fit: cover;">
+                                                </div>
+                                                <div th:unless="${category.iconFilename != null}" class="me-3">
+                                                    <i class="fas fa-folder fa-2x text-muted"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="card-title mb-1" th:text="${category.catename}"></h6>
+                                                    <small class="text-muted">ID: <span th:text="${category.cateid}"></span></small><br>
+                                                    <small class="text-muted">User ID: <span th:text="${category.userId}"></span></small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:if="${categories == null or categories.empty}" class="text-center py-4">
+                            <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No categories found</p>
+                        </div>
                     </div>
                 </div>
             </div>

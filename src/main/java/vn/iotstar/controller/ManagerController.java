@@ -27,6 +27,8 @@ public class ManagerController {
         // Add statistics for manager dashboard
         long userCategories = categoryService.findByUserId(user.getUserId()).size();
         
+        // Add manager's own categories for display
+        model.addAttribute("categories", categoryService.findByUserId(user.getUserId()));
         model.addAttribute("userCategories", userCategories);
         model.addAttribute("user", user);
         

@@ -1,5 +1,7 @@
 package vn.iotstar.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -37,6 +39,47 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     
     boolean existsByEmail(String email);
     
-    @Query("SELECT u FROM User u WHERE u.username LIKE %:keyword% OR u.fullName LIKE %:keyword% OR u.email LIKE %:keyword% ORDER BY u.createdAt DESC")
+    @Query("SELECT u FROM User u WHERE " +
+           "LOWER(u.username) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+           "ORDER BY u.createdAt DESC")
     List<User> searchByKeyword(@Param("keyword") String keyword);
+    
+    // Enhanced search with filters for admin
+    @Query("SELECT u FROM User u WHERE " +
+           "(:keyword IS NULL OR " +
+           "LOWER(u.username) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
+           "(:roleId IS NULL OR u.roleId = :roleId) AND " +
+           "(:isActive IS NULL OR u.isActive = :isActive) " +
+           "ORDER BY u.createdAt DESC")
+    List<User> adminSearchUsers(@Param("keyword") String keyword, @Param("roleId") Integer roleId, @Param("isActive") Boolean isActive);
+    
+    // Paginated search
+    @Query("SELECT u FROM User u WHERE " +
+           "LOWER(u.username) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+           "LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+           "ORDER BY u.createdAt DESC")
+    Page<User> searchByKeywordPaginated(@Param("keyword") String keyword, Pageable pageable);
+    
+    // Additional statistics queries
+    @Query("SELECT COUNT(u) FROM User u WHERE u.isActive = true")
+    Long countActiveUsers();
+    
+    @Query("SELECT COUNT(u) FROM User u WHERE u.isActive = false")
+    Long countInactiveUsers();
+    
+    // Users with category counts
+    @Query("SELECT u, COUNT(c) as categoryCount FROM User u " +
+           "LEFT JOIN Category c ON u.userId = c.userId " +
+           "GROUP BY u.userId " +
+           "ORDER BY categoryCount DESC, u.fullName")
+    List<Object[]> findUsersWithCategoryCount();
+    
+    // Recent users
+    @Query("SELECT u FROM User u WHERE u.isActive = true ORDER BY u.createdAt DESC")
+    List<User> findRecentActiveUsers(Pageable pageable);
 }
