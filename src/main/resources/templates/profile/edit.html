@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chỉnh sửa thông tin cá nhân</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#" th:text="${user.roleId == 3 ? 'Admin Panel' : (user.roleId == 2 ? 'Manager Panel' : 'User Panel')}"></a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3" th:text="'Xin chào, ' + ${user.fullName}"></span>
+                <a class="nav-link" th:href="@{/profile}">Profile</a>
+                <a class="nav-link" th:href="@{/auth/logout}">Đăng xuất</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-10 mx-auto">
+                <!-- Alert messages -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div class="row">
+                    <!-- Profile Update Form -->
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="mb-0"><i class="fas fa-user-edit me-2"></i>Chỉnh sửa thông tin</h4>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/profile/update}" method="post" enctype="multipart/form-data" th:object="${user}">
+                                    <input type="hidden" th:field="*{userId}">
+                                    <input type="hidden" th:field="*{username}">
+                                    <input type="hidden" th:field="*{password}">
+                                    <input type="hidden" th:field="*{roleId}">
+                                    <input type="hidden" th:field="*{createdAt}">
+                                    <input type="hidden" th:field="*{active}">
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="fullName" class="form-label">
+                                                    <i class="fas fa-signature me-2"></i>Họ tên <span class="text-danger">*</span>
+                                                </label>
+                                                <input type="text" th:field="*{fullName}" class="form-control" id="fullName" required>
+                                                <div th:if="${#fields.hasErrors('fullName')}" class="text-danger small">
+                                                    <span th:errors="*{fullName}"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="email" class="form-label">
+                                                    <i class="fas fa-envelope me-2"></i>Email <span class="text-danger">*</span>
+                                                </label>
+                                                <input type="email" th:field="*{email}" class="form-control" id="email" required>
+                                                <div th:if="${#fields.hasErrors('email')}" class="text-danger small">
+                                                    <span th:errors="*{email}"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="phone" class="form-label">
+                                                    <i class="fas fa-phone me-2"></i>Số điện thoại
+                                                </label>
+                                                <input type="tel" th:field="*{phone}" class="form-control" id="phone">
+                                                <div th:if="${#fields.hasErrors('phone')}" class="text-danger small">
+                                                    <span th:errors="*{phone}"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="username" class="form-label">
+                                                    <i class="fas fa-user me-2"></i>Tên đăng nhập
+                                                </label>
+                                                <input type="text" th:value="*{username}" class="form-control" id="username" readonly>
+                                                <small class="text-muted">Tên đăng nhập không thể thay đổi</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="avatarFile" class="form-label">
+                                            <i class="fas fa-image me-2"></i>Ảnh đại diện
+                                        </label>
+                                        <input type="file" class="form-control" id="avatarFile" name="avatarFile" accept="image/*">
+                                        <small class="text-muted">Chọn file ảnh để thay đổi ảnh đại diện (JPG, PNG, GIF)</small>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between">
+                                        <a th:href="@{/profile}" class="btn btn-secondary">
+                                            <i class="fas fa-arrow-left me-2"></i>Quay lại
+                                        </a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-2"></i>Lưu thay đổi
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Avatar Preview & Actions -->
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-image me-2"></i>Ảnh đại diện</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <div class="avatar-preview mb-3">
+                                    <img th:if="${user.image != null and !user.image.isEmpty()}" 
+                                         th:src="@{/uploads/avatars/} + ${user.image}" 
+                                         class="rounded-circle img-fluid" 
+                                         style="width: 150px; height: 150px; object-fit: cover;"
+                                         alt="Avatar">
+                                    <div th:if="${user.image == null or user.image.isEmpty()}" 
+                                         class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto" 
+                                         style="width: 150px; height: 150px;">
+                                        <i class="fas fa-user fa-4x text-white"></i>
+                                    </div>
+                                </div>
+                                
+                                <div th:if="${user.image != null and !user.image.isEmpty()}">
+                                    <form th:action="@{/profile/delete-avatar}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-danger btn-sm" 
+                                                onclick="return confirm('Bạn có chắc chắn muốn xóa ảnh đại diện?')">
+                                            <i class="fas fa-trash me-2"></i>Xóa ảnh
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Change Password Card -->
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-lock me-2"></i>Đổi mật khẩu</h5>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/profile/change-password}" method="post">
+                                    <div class="mb-3">
+                                        <label for="currentPassword" class="form-label">Mật khẩu hiện tại</label>
+                                        <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="newPassword" class="form-label">Mật khẩu mới</label>
+                                        <input type="password" class="form-control" id="newPassword" name="newPassword" required minlength="6">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="confirmPassword" class="form-label">Xác nhận mật khẩu mới</label>
+                                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required minlength="6">
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-warning w-100">
+                                        <i class="fas fa-key me-2"></i>Đổi mật khẩu
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Preview avatar before upload
+        document.getElementById('avatarFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.querySelector('.avatar-preview img, .avatar-preview div');
+                    if (preview.tagName === 'IMG') {
+                        preview.src = e.target.result;
+                    } else {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'rounded-circle img-fluid';
+                        img.style.cssText = 'width: 150px; height: 150px; object-fit: cover;';
+                        img.alt = 'Avatar Preview';
+                        preview.parentNode.replaceChild(img, preview);
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Validate password confirmation
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = this.value;
+            
+            if (newPassword !== confirmPassword) {
+                this.setCustomValidity('Mật khẩu xác nhận không khớp');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    </script>
+</body>
+</html>
